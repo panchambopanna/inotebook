@@ -1,11 +1,13 @@
-const express = require('express');
-const User = require('../models/User')
-const router = express.Router();
-const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
+const express = require('express'); //this is to communicate b/w backend and database
+const User = require('../models/User'); //this is importing schema for user
+const router = express.Router(); //router for express to contact API
+const { body, validationResult } = require('express-validator'); //This is to validate fields entered
+const bcrypt = require('bcryptjs'); //this is to has passwords
+const jwt = require('jsonwebtoken'); //tihs is to egnerated usertoken to authenticate user
+
+const JWT_KEY = 'panchamisagoodboy'; // this is a secret key fpr JWT authentication
 
 //create a User using: POST "/api/auth/createUser". Doesn't require Authentication
-
 router.post('/createUser', [
     body('name', "Length should be greater than 3").isLength({ min: 5 }), //validating 'name' in body of request by length
     body('email', 'Invalid email address').isEmail(), //validating 'email' in body of request  by format
@@ -33,7 +35,15 @@ router.post('/createUser', [
             email: req.body.email,
             password: secPass //hashed password
         })
-        res.json(user);
+
+        const data = {
+            user:{
+                id: user.id
+            }
+        }
+        const authtoken = jwt.sign(data, JWT_KEY);
+
+        res.json({authtoken});
 
         // .then(user => res.json(user))
         // .catch(err=>{console.log(err)
