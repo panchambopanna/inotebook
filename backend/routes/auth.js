@@ -37,22 +37,64 @@ router.post('/createUser', [
         })
 
         const data = {
-            user:{
+            user: {
                 id: user.id
             }
         }
         const authtoken = jwt.sign(data, JWT_KEY);
 
-        res.json({authtoken});
+        res.json({ authtoken });
 
         // .then(user => res.json(user))
         // .catch(err=>{console.log(err)
         // res.json({error: 'Please enter a unique value', message: err.message})})
-    } catch(error) {
+    } catch (error) {
         console.error(error.message); //ideally logger or SQS is used to log error messages
         res.status(500).send("Internal server error");
     }
 }
 )
+
+//create a User using: POST "/api/auth/loginUser". Doesn't require Authentication
+router.post('/loginUser', [
+    body('email', 'Invalid email address').isEmail(), //validating 'email' in body of request  by format
+    body('password', 'Password canot be blank').exists() //validating 'password' in body of request by length 
+], async (req, res) => {
+
+    // this checks if the request is faulty and sends a response of 400 and the error message
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    const { email, password } = req.body;
+
+    try {
+        //check if the email entered is in the database
+        let user = await User.findOne({ email: req.body.email })
+        if (!user) {
+            return res.status(400).json({ error: "Incorrect eamil or password. Please check the credentials and try again" });
+        }
+        //compare the pasword entered with the password in database
+        const passCompare = await bcrypt.compare(password, user.password);
+        if (!passCompare) {
+            return res.status(400).json({ error: "Incorrect eamil or password. Please check the credentials and try again" });
+        }
+
+        const data = {
+            user: {
+                id: user.id
+            }
+        }
+
+        const authtoken = jwt.sign(data, JWT_KEY);
+        res.json({ authtoken });
+
+
+    } catch (error) {
+        console.error(error.message); //ideally logger or SQS is used to log error messages
+        res.status(500).send("Internal server error");
+    }
+
+})
 
 module.exports = router 
