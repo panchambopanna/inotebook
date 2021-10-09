@@ -102,7 +102,7 @@ router.post('/loginUser', [
 router.post('/getUser', fetchUser, [
 ], async (req, res) => {
     try {
-        userId = req.user.id; //fetched the ID from user 
+        const userId = req.user.id; //fetched the ID from user 
         const user = await User.findById(userId).select("-password"); //gets all user details except password
         res.send(user); //sends the user data in response
     } catch (error) {
