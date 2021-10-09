@@ -4,10 +4,11 @@ const router = express.Router(); //router for express to contact API
 const { body, validationResult } = require('express-validator'); //This is to validate fields entered
 const bcrypt = require('bcryptjs'); //this is to has passwords
 const jwt = require('jsonwebtoken'); //tihs is to egnerated usertoken to authenticate user
+const fetchUser = require('../middleware/fetchuser'); //this gets the fetchUser function fom middleeware folder fetchuser file
 
 const JWT_KEY = 'panchamisagoodboy'; // this is a secret key fpr JWT authentication
 
-//create a User using: POST "/api/auth/createUser". Doesn't require Authentication
+//ROUTE 1: create a User using: POST "/api/auth/createUser". Doesn't require Authentication
 router.post('/createUser', [
     body('name', "Length should be greater than 3").isLength({ min: 5 }), //validating 'name' in body of request by length
     body('email', 'Invalid email address').isEmail(), //validating 'email' in body of request  by format
@@ -55,7 +56,7 @@ router.post('/createUser', [
 }
 )
 
-//create a User using: POST "/api/auth/loginUser". Doesn't require Authentication
+//ROUTE 2: create a User using: POST "/api/auth/loginUser". Doesn't require Authentication
 router.post('/loginUser', [
     body('email', 'Invalid email address').isEmail(), //validating 'email' in body of request  by format
     body('password', 'Password canot be blank').exists() //validating 'password' in body of request by length 
@@ -97,4 +98,17 @@ router.post('/loginUser', [
 
 })
 
-module.exports = router 
+//ROUTE 3: Get user details: POST "/api/auth/getUser". Requires Authentication
+router.post('/getUser', fetchUser, [
+], async (req, res) => {
+    try {
+        userId = req.user.id;
+        const user = await User.findById(userId).select("-password");
+        res.send(user);
+    } catch (error) {
+        res.status(500).send("Internal server error");
+    }
+
+})
+
+module.exports = router;
