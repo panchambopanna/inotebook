@@ -12,18 +12,20 @@ const JWT_KEY = 'panchamisagoodboy'; // this is a secret key fpr JWT authenticat
 router.post('/createUser', [
     body('name', "Length should be greater than 3").isLength({ min: 5 }), //validating 'name' in body of request by length
     body('email', 'Invalid email address').isEmail(), //validating 'email' in body of request  by format
-    body('password', 'Minimum length: 8').isLength({ min: 5 }) //validating 'password' in body of request by length 
+    body('password', 'Minimum length: 8').isLength({ min: 8}) //validating 'password' in body of request by length 
 ], async (req, res) => {
     // this checks if the request is faulty and sends a response of 400 and the error message
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        const success= false;
+        return res.status(400).json({ success, errors: errors.array() });
     }
     //check if the user with the particular email exists already
     try {
         let user = await User.findOne({ email: req.body.email })
         if (user) {
-            return res.status(400).json({ error: "Email already exists, please try login with the same email or use different mail to sign up" });
+            const success = false;
+            return res.status(400).json({success, error: "Email already exists, please try login with the same email or use different mail to sign up" });
         }
 
         //hashing password sing bcryptjs
@@ -44,7 +46,8 @@ router.post('/createUser', [
         }
         const authtoken = jwt.sign(data, JWT_KEY);
 
-        res.json({ authtoken });
+        const success = true;
+        res.json({ success, authtoken });
 
         // .then(user => res.json(user))
         // .catch(err=>{console.log(err)
@@ -56,7 +59,7 @@ router.post('/createUser', [
 }
 )
 
-//ROUTE 2: create a User using: POST "/api/auth/loginUser". Doesn't require Authentication
+//ROUTE 2: login a User using: POST "/api/auth/loginUser". Doesn't require Authentication
 router.post('/loginUser', [
     body('email', 'Invalid email address').isEmail(), //validating 'email' in body of request  by format
     body('password', 'Password canot be blank').exists() //validating 'password' in body of request by length 
@@ -65,7 +68,8 @@ router.post('/loginUser', [
     // this checks if the request is faulty and sends a response of 400 and the error message
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        const success = false;
+        return res.status(400).json({success, errors: errors.array() });
     }
     const { email, password } = req.body;
 
@@ -78,7 +82,8 @@ router.post('/loginUser', [
         //compare the pasword entered with the password in database
         const passCompare = await bcrypt.compare(password, user.password);
         if (!passCompare) {
-            return res.status(400).json({ error: "Incorrect eamil or password. Please check the credentials and try again" });
+            const success = false;
+            return res.status(400).json({success, error: "Incorrect eamil or password. Please check the credentials and try again" });
         }
 
         const data = {
@@ -88,7 +93,8 @@ router.post('/loginUser', [
         }
 
         const authtoken = jwt.sign(data, JWT_KEY);
-        res.json({ authtoken });
+        const success = true;
+        res.json({success, authtoken });
 
 
     } catch (error) {
