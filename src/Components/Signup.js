@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom';
 
-export default function Signup() {
+export default function Signup(props) {
 
     let history = useHistory();
 
@@ -18,6 +18,7 @@ export default function Signup() {
             success = true;
         } else {
             success = false;
+            props.showAlert('Passwords do not match', 'danger');
         }
 
         if (success) {
@@ -34,16 +35,17 @@ export default function Signup() {
             if (json.success) {
                 //save auth token in local storage and redirect
                 localStorage.setItem('auth', json.authtoken);
-                history.push('/')
+                history.push('/');
+                props.showAlert('Signed in successfully', 'success');
             } else {
-                alert(json.error);
+                props.showAlert('Invalid Credentials', 'danger');
             }
         }
 
     }
 
     return (
-        <div className='container'>
+        <div className='container my-2'>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="name" className="form-label">Name</label>
@@ -55,12 +57,12 @@ export default function Signup() {
                 </div>
                 <div className="mb-3">
                     <label htmlFor="password" className="form-label">Password</label>
-                    <input type="password" className="form-control" id="password" name='password' aria-describedby="passHelp" onChange={onChange} required minLength={8}/>
+                    <input type="password" className="form-control" id="password" name='password' aria-describedby="passHelp" onChange={onChange} required minLength={8} />
                     <div id="passHelp" className="form-text">Must be 8 - 20 characters long</div>
                 </div>
                 <div className="mb-3">
                     <label htmlFor="rpassword" className="form-label" >Confirm Password</label>
-                    <input type="password" className="form-control" id="rpassword" name='rpassword' onChange={onChange} required minLength={8}/>
+                    <input type="password" className="form-control" id="rpassword" name='rpassword' onChange={onChange} required minLength={8} />
                 </div>
                 <button type="submit" className="btn btn-primary">Sign Up!</button>
             </form>

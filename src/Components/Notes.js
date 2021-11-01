@@ -26,7 +26,7 @@ export default function Notes(props) {
     const handleClick = (e) => {
         e.preventDefault();
         editNote(note._id, note.title, note.description, note.tag);
-        showAlert('Notes updated', 'success');  //set alert message
+        showAlert('Note has been updated', 'success');  //set alert message
         ref.current.click();
     }
 
@@ -87,7 +87,7 @@ export default function Notes(props) {
                 </div>
 
                 {notes.map((notes) => {
-                    return <Noteitem key={notes._id} updateNote={updateNote} notes={notes} />
+                    return <Noteitem key={notes._id} updateNote={updateNote} notes={notes} showAlert={showAlert} />
                 })}
             </div>
         </>

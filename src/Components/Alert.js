@@ -1,9 +1,12 @@
 import React from 'react'
 
 export default function Alert(props) {
-    const Capitalize = (type) => {
-        const lower = type.toLowerCase();
-        return (type.charAt(0).toUpperCase() + lower.slice(1));
+    const Capitalize = (word) => {
+        if (word==='danger'){
+            word = 'error';
+        }
+        const lower = word.toLowerCase();
+        return (word.charAt(0).toUpperCase() + lower.slice(1));
     }
     return (
         <div style={{height: '50px'}}>
