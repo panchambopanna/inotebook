@@ -1,10 +1,16 @@
 import React from 'react';
-import { Link, useLocation } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 
 
 export default function Navbar() {
 
     const location = useLocation();
+    let history = useHistory();
+
+    const clearAuth = ()=>{
+        localStorage.removeItem('auth');
+        history.push('/login');
+    }
 
     return (
         <div>
@@ -23,10 +29,10 @@ export default function Navbar() {
                                 <Link className={`nav-link ${location.pathname === '/about' ? 'active' : ""}`} aria-current="page" to="/about">About</Link>
                             </li>
                         </ul>
-                        <form className="d-flex">
+                        {!localStorage.getItem('auth')?<form className="d-flex">
                             <Link className="btn btn-primary mx-2" to="/login" role="button">Login</Link>
                             <Link className="btn btn-primary" to="/signup" role="button">Sign Up</Link>
-                        </form>
+                        </form>: <button className= "btn btn-primary" onClick={clearAuth}>Logout</button>}
                     </div>
                 </div>
             </nav>
