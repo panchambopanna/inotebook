@@ -38,7 +38,7 @@ export default function Signup(props) {
                 history.push('/');
                 props.showAlert('Signed in successfully', 'success');
             } else {
-                props.showAlert('Invalid Credentials', 'danger');
+                props.showAlert(json.error, 'danger');
             }
         }
 
